@@ -150,6 +150,14 @@ function compareVersions(a, b) {
 }
 
 /**
+ * 从远程同步 tag
+ */
+function fetchTags(projectPath) {
+  const result = execGit(projectPath, 'fetch --tags --force');
+  return result;
+}
+
+/**
  * 获取项目的所有 tag
  */
 function getAllTags(projectPath) {
@@ -265,6 +273,8 @@ async function selectProjects(rl, projects) {
   for (let index = 0; index < projects.length; index++) {
     const project = projects[index];
     const projectPath = path.join(SPA_ROOT, project);
+    // 先同步远程 tag
+    fetchTags(projectPath);
     const tags = getAllTags(projectPath);
     const maxRelease = getMaxReleaseVersion(tags);
     const versionInfo = maxRelease
@@ -430,6 +440,13 @@ async function createTagForProject(projectName, options) {
   log(`\n${'─'.repeat(60)}`, 'cyan');
   logInfo(`处理项目: ${projectName}`);
 
+  // 先同步远程 tag
+  logInfo('同步远程 tag...');
+  const fetchResult = fetchTags(projectPath);
+  if (!fetchResult.success) {
+    logWarn(`同步 tag 失败: ${fetchResult.error}`);
+  }
+
   // 获取所有 tag
   const tags = getAllTags(projectPath);
   if (tags.length === 0) {
@@ -548,8 +565,11 @@ async function main() {
     console.log('─'.repeat(60));
 
     const previewResults = [];
+    logInfo('正在同步远程 tag 并计算版本号...');
     for (const project of selectedProjects) {
       const projectPath = path.join(SPA_ROOT, project);
+      // 同步远程 tag
+      fetchTags(projectPath);
       const tags = getAllTags(projectPath);
       const nextVersion = getNextRCVersion(tags);
 
@@ -568,6 +588,14 @@ async function main() {
       logError('没有可创建 tag 的项目');
       rl.close();
       process.exit(1);
+    }
+
+    // 交互式询问是否推送（如果命令行没有指定）
+    let shouldPush = options.push;
+    if (!options.push && !options.yes && !options.dryRun) {
+      const pushAnswer = await question(rl, '\n是否推送 tag 到远程? (Y/n): ');
+      shouldPush = pushAnswer.toLowerCase() !== 'n';
+      options.push = shouldPush;
     }
 
     // 确认操作

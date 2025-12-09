@@ -665,6 +665,30 @@ async function main() {
       description = description.trim();
     }
 
+    // 交互式询问是否提交更改（如果命令行没有指定）
+    let shouldCommit = options.commit;
+    let commitMessage = options.commitMsg;
+    if (!options.commit && !options.yes) {
+      const commitAnswer = await question(rl, '\n是否暂存并提交更改? (y/N): ');
+      shouldCommit = commitAnswer.toLowerCase() === 'y';
+      if (shouldCommit && !commitMessage) {
+        const msgAnswer = await question(rl, `请输入提交信息 [${title}]: `);
+        commitMessage = msgAnswer.trim() || title;
+      }
+    }
+
+    // 交互式询问是否推送（如果命令行没有指定）
+    let shouldPush = options.push;
+    if (!options.push && !options.yes) {
+      const pushAnswer = await question(rl, '是否推送分支到远程? (Y/n): ');
+      shouldPush = pushAnswer.toLowerCase() !== 'n';
+    }
+
+    // 更新选项
+    options.commit = shouldCommit;
+    options.commitMsg = commitMessage;
+    options.push = shouldPush;
+
     // 确认操作
     if (!options.yes) {
       console.log('\n即将执行以下操作:');
