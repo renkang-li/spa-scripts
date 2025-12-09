@@ -163,6 +163,52 @@ function branchExists(projectPath, branchName) {
 }
 
 /**
+ * 检查是否有未提交的更改
+ */
+function hasUncommittedChanges(projectPath) {
+  try {
+    const result = execSync('git status --porcelain', {
+      cwd: projectPath,
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+    return result.trim().length > 0;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * 暂存所有文件并提交
+ */
+function commitChanges(projectPath, message) {
+  try {
+    // 先暂存所有更改
+    execSync('git add -A', {
+      cwd: projectPath,
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+
+    // 提交
+    execSync(`git commit -m "${message.replace(/"/g, '\\"')}"`, {
+      cwd: projectPath,
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+
+    return { success: true };
+  } catch (error) {
+    const errorMsg = error.stderr?.trim() || error.message;
+    // 如果是因为没有需要提交的更改，不视为错误
+    if (errorMsg.includes('nothing to commit') || errorMsg.includes('no changes added')) {
+      return { success: true, noChanges: true };
+    }
+    return { success: false, error: errorMsg };
+  }
+}
+
+/**
  * 推送分支到远程
  */
 function pushBranch(projectPath, branchName) {
@@ -318,6 +364,8 @@ function printHelp() {
   --desc               MR 描述
   --draft              创建 Draft MR（默认是）
   --no-draft           创建非 Draft MR
+  --commit             暂存所有文件并提交（需配合 --commit-msg）
+  --commit-msg         提交信息（默认使用 MR 标题）
   --push               创建前先推送分支
   -y, --yes            跳过确认提示
 
@@ -326,6 +374,7 @@ function printHelp() {
   node create-merge.js -a -s feature/new-feature --title "feat: 新功能"
   node create-merge.js -p "spa-shop,spa-store" -s fix/bug --title "fix: 修复问题"
   node create-merge.js -a --push -s feature/update --title "feat: 更新" --desc "#123456"
+  node create-merge.js -a --commit --push --title "feat: 新功能" --commit-msg "feat: add new feature"
 `);
 }
 
@@ -342,6 +391,8 @@ function parseArgs(args) {
     title: null,
     description: '',
     isDraft: true,
+    commit: false,
+    commitMsg: null,
     push: false,
     yes: false,
   };
@@ -392,6 +443,14 @@ function parseArgs(args) {
       case '--no-draft':
         options.isDraft = false;
         break;
+      case '--commit':
+        options.commit = true;
+        break;
+      case '--commit-msg':
+        if (args[i + 1]) {
+          options.commitMsg = args[++i];
+        }
+        break;
       case '--push':
         options.push = true;
         break;
@@ -409,7 +468,7 @@ function parseArgs(args) {
  * 为单个项目创建 MR
  */
 async function createMRForProject(projectName, options) {
-  const { glabPath, sourceBranch, targetBranch, title, description, isDraft, push } = options;
+  const { glabPath, sourceBranch, targetBranch, title, description, isDraft, commit, commitMsg, push } = options;
   const projectPath = path.join(SPA_ROOT, projectName);
   const repoPath = REPO_MAPPING[projectName] || `unknown/${projectName}`;
 
@@ -431,6 +490,27 @@ async function createMRForProject(projectName, options) {
     logError(`源分支 ${sourceBranch} 不存在`);
     result.error = `源分支 ${sourceBranch} 不存在`;
     return result;
+  }
+
+  // 如果需要提交
+  if (commit) {
+    if (hasUncommittedChanges(projectPath)) {
+      const message = commitMsg || title;
+      logInfo(`暂存并提交更改: ${message}`);
+      const commitResult = commitChanges(projectPath, message);
+      if (!commitResult.success) {
+        logError(`提交失败: ${commitResult.error}`);
+        result.error = `提交失败: ${commitResult.error}`;
+        return result;
+      }
+      if (commitResult.noChanges) {
+        logWarn('没有需要提交的更改');
+      } else {
+        logSuccess('更改已提交');
+      }
+    } else {
+      log('  没有未提交的更改', 'dim');
+    }
   }
 
   // 如果需要推送
@@ -594,6 +674,10 @@ async function main() {
       console.log(`  MR 标题:  ${title}`);
       console.log(`  MR 描述:  ${description || '(无)'}`);
       console.log(`  Draft:    ${options.isDraft ? '是' : '否'}`);
+      console.log(`  提交更改: ${options.commit ? '是' : '否'}`);
+      if (options.commit) {
+        console.log(`  提交信息: ${options.commitMsg || title}`);
+      }
       console.log(`  推送分支: ${options.push ? '是' : '否'}`);
       console.log(`  项目数:   ${selectedProjects.length}`);
       console.log('─'.repeat(60));
@@ -618,6 +702,8 @@ async function main() {
         title,
         description,
         isDraft: options.isDraft,
+        commit: options.commit,
+        commitMsg: options.commitMsg,
         push: options.push,
       });
       results.push(result);
