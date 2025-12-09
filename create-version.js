@@ -665,6 +665,15 @@ async function main() {
         console.log(`  cd ${r.project} && git push origin ${r.tag}`);
       });
     }
+
+    // 输出简洁格式的版本列表（方便复制）
+    if (successCount > 0) {
+      console.log('\n版本列表（可复制）:');
+      console.log('─'.repeat(60));
+      results.filter(r => r.success).forEach(r => {
+        console.log(`${r.project}:${r.tag}`);
+      });
+    }
     console.log('');
 
   } catch (error) {
