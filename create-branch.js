@@ -15,7 +15,9 @@ const path = require('path');
 const readline = require('readline');
 
 // 配置
-const SPA_ROOT = path.resolve(__dirname, '..');
+const SPA_ROOT = process.env.SPA_ROOT_DIR
+  ? path.resolve(process.env.SPA_ROOT_DIR)
+  : path.resolve(__dirname, '..');
 const BRANCH_PREFIX_PATTERNS = [
   /^feature\/.+$/,    // feature/xxx
   /^fix\/.+$/,        // fix/xxx

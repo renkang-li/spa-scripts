@@ -16,7 +16,9 @@ const path = require('path');
 const readline = require('readline');
 
 // 配置
-const SPA_ROOT = path.resolve(__dirname, '..');
+const SPA_ROOT = process.env.SPA_ROOT_DIR
+  ? path.resolve(process.env.SPA_ROOT_DIR)
+  : path.resolve(__dirname, '..');
 
 // GitLab 仓库路径映射（本地目录名 -> GitLab 仓库路径）
 const REPO_MAPPING = {
@@ -388,8 +390,10 @@ function parseArgs(args) {
     all: false,
     sourceBranch: null,
     targetBranch: 'master',
+    targetProvided: false,
     title: null,
     description: '',
+    descriptionProvided: false,
     isDraft: true,
     commit: false,
     commitMsg: null,
@@ -425,6 +429,7 @@ function parseArgs(args) {
       case '--target':
         if (args[i + 1]) {
           options.targetBranch = args[++i];
+          options.targetProvided = true;
         }
         break;
       case '--title':
@@ -433,8 +438,9 @@ function parseArgs(args) {
         }
         break;
       case '--desc':
-        if (args[i + 1]) {
+        if (args[i + 1] !== undefined) {
           options.description = args[++i];
+          options.descriptionProvided = true;
         }
         break;
       case '--draft':
@@ -641,7 +647,7 @@ async function main() {
     }
 
     // 输入目标分支
-    if (!options.targetBranch || options.targetBranch === 'master') {
+    if (!options.targetProvided) {
       const input = await question(rl, `请输入目标分支名 [${targetBranch}]: `);
       if (input.trim()) {
         targetBranch = input.trim();
@@ -660,7 +666,7 @@ async function main() {
     }
 
     // 输入描述
-    if (!description) {
+    if (!options.descriptionProvided) {
       description = await question(rl, '请输入 MR 描述（可选，如 Jira 单号）: ');
       description = description.trim();
     }
