@@ -667,7 +667,7 @@ async function main() {
 
     // 输入描述
     if (!options.descriptionProvided) {
-      description = await question(rl, '请输入 MR 描述（可选，如 Jira 单号）: ');
+      description = await question(rl, '请输入 MR 描述（可选，如 飞书 单号）: ');
       description = description.trim();
     }
 

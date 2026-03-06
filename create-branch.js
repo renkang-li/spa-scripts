@@ -315,7 +315,7 @@ function printHelp() {
 
 示例:
   node create-branch.js feature/new-feature
-  node create-branch.js -a feature/JIRA-123
+  node create-branch.js -a feature/XXXX
   node create-branch.js -p "spa-shop,spa-store" feature/update
   node create-branch.js -a -s -f feature/reset-branch
 
