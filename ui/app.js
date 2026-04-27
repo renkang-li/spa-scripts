@@ -175,12 +175,10 @@ function renderProjects() {
     } else {
       toggleBtn.disabled = false;
       const selectedVisibleCount = visibleProjects.filter(p => state.selected.has(p.name)).length;
-      if (selectedVisibleCount === 0) {
-        toggleBtn.textContent = '全选';
-      } else if (selectedVisibleCount === visibleProjects.length) {
-        toggleBtn.textContent = '清空';
+      if (selectedVisibleCount === visibleProjects.length) {
+        toggleBtn.textContent = '全不选';
       } else {
-        toggleBtn.textContent = '反选';
+        toggleBtn.textContent = '全选';
       }
     }
   }
@@ -253,18 +251,10 @@ function toggleSelection() {
 
   const selectedVisibleCount = visible.filter(p => state.selected.has(p.name)).length;
 
-  if (selectedVisibleCount === 0) {
-    visible.forEach(p => state.selected.add(p.name));
-  } else if (selectedVisibleCount === visible.length) {
+  if (selectedVisibleCount === visible.length) {
     visible.forEach(p => state.selected.delete(p.name));
   } else {
-    visible.forEach(p => {
-      if (state.selected.has(p.name)) {
-        state.selected.delete(p.name);
-      } else {
-        state.selected.add(p.name);
-      }
-    });
+    visible.forEach(p => state.selected.add(p.name));
   }
   renderProjects();
 }
