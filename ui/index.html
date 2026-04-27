@@ -1,96 +1,91 @@
 <!doctype html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>SPA Scripts UI</title>
-    <link rel="stylesheet" href="/styles.css">
-  </head>
-  <body>
-    <div class="page-shell">
-      <aside class="sidebar-panel">
-        <div class="brand-card">
-          <p class="eyebrow">Local Workspace Console</p>
-          <h1>SPA Scripts UI</h1>
-          <p class="lede">在浏览器里完成项目筛选、计划预览和批量执行，底层直接复用 CLI workflow。</p>
-        </div>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SPA Scripts UI</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <h1>SPA Scripts</h1>
+      <span class="badge">Console</span>
+    </div>
+    <div class="env-info">
+      <div class="env-item">
+        <span class="label">Workspace:</span>
+        <strong id="workspace-root" class="value">Loading...</strong>
+      </div>
+      <div class="env-item">
+        <span class="label">glab:</span>
+        <strong id="glab-status" class="value">Checking...</strong>
+      </div>
+    </div>
+  </header>
 
-        <div class="meta-card">
-          <div>
-            <span class="meta-label">Workspace</span>
-            <strong id="workspace-root">Loading...</strong>
-          </div>
-          <div>
-            <span class="meta-label">glab</span>
-            <strong id="glab-status">Checking...</strong>
-          </div>
-        </div>
-
+  <div class="page-shell">
+    <aside class="sidebar-panel">
+      <div class="sidebar-header">
+        <h2>项目列表</h2>
         <div class="project-toolbar">
-          <input id="project-search" type="search" placeholder="搜索项目名或仓库路径">
+          <input id="project-search" type="search" placeholder="搜索项目名或仓库路径...">
           <div class="toolbar-row">
             <button id="refresh-projects" class="ghost-button">刷新</button>
-            <button id="select-visible" class="ghost-button">选中可见</button>
-            <button id="clear-selection" class="ghost-button">清空选择</button>
+            <button id="select-visible" class="ghost-button">全选可见</button>
+            <button id="clear-selection" class="ghost-button">清空</button>
           </div>
           <p id="project-summary" class="toolbar-note">Loading projects...</p>
         </div>
+      </div>
+      <div id="project-list" class="project-list"></div>
+    </aside>
 
-        <div id="project-list" class="project-list"></div>
-      </aside>
-
-      <main class="workspace-panel">
-        <section class="action-panel">
-          <div class="panel-header">
-            <div>
-              <p class="eyebrow">Batch Operations</p>
-              <h2>操作面板</h2>
-            </div>
-            <div class="button-cluster">
-              <button id="plan-action" class="secondary-button">预览计划</button>
-              <button id="run-action" class="primary-button">执行操作</button>
-            </div>
-          </div>
-
+    <main class="workspace-panel">
+      <section class="action-panel">
+        <div class="panel-header">
+          <h2>操作面板</h2>
           <div class="tab-strip">
             <button class="tab-button active" data-tab="branch">建分支</button>
             <button class="tab-button" data-tab="merge">建 MR</button>
             <button class="tab-button" data-tab="version">打 RC Tag</button>
           </div>
+        </div>
 
+        <div class="panel-content">
           <div class="tab-panel active" data-panel="branch">
             <div class="form-grid">
-              <label>
+              <label class="form-group">
                 <span>目标分支</span>
-                <input id="branch-name" type="text" placeholder="feature/checkout-funnel">
+                <input id="branch-name" type="text" placeholder="例如: feature/checkout-funnel">
               </label>
-              <label>
+              <label class="form-group">
                 <span>基线引用</span>
                 <input id="branch-base" type="text" value="origin/master" placeholder="origin/master">
               </label>
             </div>
-            <label class="toggle-row">
+            <label class="toggle-row mt-3">
               <input id="branch-fetch" type="checkbox" checked>
               <span>执行前先 `git fetch origin --prune`</span>
             </label>
-            <p class="helper-note">如果本地或远程已经有同名分支，会直接切换过去；若任一项目存在未提交更改，会整批停止。</p>
+            <p class="helper-note">提示: 如果本地或远程已经有同名分支，会直接切换过去；若任一项目存在未提交更改，会整批停止。</p>
           </div>
 
           <div class="tab-panel" data-panel="merge">
             <div class="form-grid">
-              <label>
+              <label class="form-group">
                 <span>源分支</span>
                 <input id="merge-source" type="text" value="@current" placeholder="@current">
               </label>
-              <label>
+              <label class="form-group">
                 <span>目标分支</span>
                 <input id="merge-target" type="text" value="master" placeholder="master">
               </label>
-              <label class="wide">
+              <label class="form-group wide">
                 <span>MR 标题</span>
-                <input id="merge-title" type="text" placeholder="feat: checkout funnel">
+                <input id="merge-title" type="text" placeholder="例如: feat: checkout funnel">
               </label>
-              <label class="wide">
+              <label class="form-group wide">
                 <span>MR 描述</span>
                 <textarea id="merge-desc" rows="3" placeholder="可选，比如飞书单号或补充说明"></textarea>
               </label>
@@ -109,7 +104,7 @@
                 <span>自动提交未提交更改</span>
               </label>
             </div>
-            <label>
+            <label class="form-group wide mt-3">
               <span>提交信息</span>
               <input id="merge-commit-msg" type="text" placeholder="默认复用 MR 标题">
             </label>
@@ -117,7 +112,7 @@
 
           <div class="tab-panel" data-panel="version">
             <div class="form-grid">
-              <label class="wide">
+              <label class="form-group wide">
                 <span>Tag 注释</span>
                 <input id="version-message" type="text" placeholder="默认使用版本号">
               </label>
@@ -132,25 +127,28 @@
                 <span>执行时仍使用 dry-run</span>
               </label>
             </div>
-            <p class="helper-note">预览会同步远程 tag 并计算下一个 RC 版本。</p>
+            <p class="helper-note">提示: 预览会同步远程 tag 并计算下一个 RC 版本。</p>
           </div>
-        </section>
+        </div>
 
-        <section class="output-panel">
-          <div class="panel-header compact">
-            <div>
-              <p class="eyebrow">Execution Feed</p>
-              <h2>结果与日志</h2>
-            </div>
-            <button id="clear-output" class="ghost-button">清空输出</button>
-          </div>
-          <div id="output" class="output-surface">
-            <p class="empty-state">先选择项目，再点击“预览计划”或“执行操作”。</p>
-          </div>
-        </section>
-      </main>
-    </div>
+        <div class="panel-footer">
+          <button id="plan-action" class="secondary-button">预览计划</button>
+          <button id="run-action" class="primary-button">执行操作</button>
+        </div>
+      </section>
 
-    <script src="/app.js"></script>
-  </body>
-  </html>
+      <section class="output-panel">
+        <div class="output-header">
+          <h2>执行结果与日志</h2>
+          <button id="clear-output" class="ghost-button small">清空</button>
+        </div>
+        <div id="output" class="output-surface">
+          <div class="empty-state">先选择项目，再点击“预览计划”或“执行操作”。</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
