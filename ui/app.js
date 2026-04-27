@@ -110,8 +110,7 @@ function renderProjects() {
         <span class="chip ${project.dirty ? 'dirty' : 'clean'}">${project.dirty ? 'dirty' : 'clean'}</span>
       </div>
       <div class="project-meta">
-        <span class="chip mono">${escapeHtml(project.currentBranch)}</span>
-        <span class="chip mono">${escapeHtml(project.repoPath)}</span>
+        <span class="chip branch mono">${escapeHtml(project.currentBranch)}</span>
       </div>
       ${project.dirtyEntries.length ? `<div class="mono">${escapeHtml(project.dirtyEntries.join(' · '))}</div>` : ''}
     </label>
