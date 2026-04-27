@@ -152,7 +152,7 @@ body {
 .project-item {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   padding: 12px;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -166,35 +166,48 @@ body {
   background: #f8fafc;
 }
 
-.project-item > .mono {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  word-break: break-all;
-  margin-top: 2px;
-  line-height: 1.4;
-}
-
 .project-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.project-head > div {
+.project-title-row {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .project-name {
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.9375rem;
+  color: var(--text-main);
 }
 
-.project-meta {
+.project-branch {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 6px;
+  color: var(--text-muted);
+  padding-left: 21px;
+}
+
+.project-branch svg {
+  opacity: 0.7;
+}
+
+.project-branch .mono {
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.project-dirty-files {
+  font-size: 0.75rem;
+  color: var(--danger);
+  word-break: break-all;
+  padding-left: 21px;
+  line-height: 1.4;
+  opacity: 0.8;
 }
 
 /* Chips */
@@ -208,13 +221,6 @@ body {
 }
 .chip.dirty { background: #fee2e2; color: #b91c1c; }
 .chip.clean { background: #d1fae5; color: #047857; }
-.chip.branch {
-  background: #e0e7ff;
-  color: #3730a3;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  border: 1px solid #c7d2fe;
-}
 
 /* Main Area */
 .workspace-panel {
