@@ -105,9 +105,24 @@ body {
   flex-direction: column;
   background: var(--bg-panel);
   border-right: 1px solid var(--border);
-  resize: horizontal;
-  overflow-x: hidden;
-  overflow-y: hidden;
+  position: relative;
+  min-height: 0;
+}
+
+.sidebar-resizer {
+  position: absolute;
+  top: 0;
+  right: -3px;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 10;
+  transition: background-color 0.15s ease;
+}
+
+.sidebar-resizer:hover, .sidebar-resizer.dragging {
+  background-color: var(--primary);
+  opacity: 0.3;
 }
 
 .sidebar-header {
@@ -147,6 +162,7 @@ body {
 
 .project-list {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   padding: 12px;
   display: flex;

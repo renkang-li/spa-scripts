@@ -78,6 +78,34 @@ function bindEvents() {
       }
     }
   });
+
+  const resizer = document.querySelector('.sidebar-resizer');
+  const sidebar = document.querySelector('.sidebar-panel');
+  if (resizer && sidebar) {
+    let isResizing = false;
+    resizer.addEventListener('mousedown', () => {
+      isResizing = true;
+      document.body.style.cursor = 'col-resize';
+      resizer.classList.add('dragging');
+      document.body.style.userSelect = 'none';
+    });
+    document.addEventListener('mousemove', (e) => {
+      if (!isResizing) return;
+      let newWidth = e.clientX - sidebar.getBoundingClientRect().left;
+      const maxWidth = window.innerWidth * 0.5;
+      if (newWidth < 240) newWidth = 240;
+      if (newWidth > maxWidth) newWidth = maxWidth;
+      sidebar.style.width = `${newWidth}px`;
+    });
+    document.addEventListener('mouseup', () => {
+      if (isResizing) {
+        isResizing = false;
+        document.body.style.cursor = '';
+        resizer.classList.remove('dragging');
+        document.body.style.userSelect = '';
+      }
+    });
+  }
 }
 
 async function api(path, options = {}) {
