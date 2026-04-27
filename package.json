@@ -5,7 +5,8 @@
   "author": "Local",
   "description": "CLI toolkit for SPA batch git workflows.",
   "scripts": {
-    "start": "node ./cli.js",
+    "start": "node ./ui/server.js",
+    "ui": "node ./ui/server.js",
     "cli": "node ./cli.js",
     "branch": "node ./create-branch.js",
     "merge": "node ./create-merge.js",

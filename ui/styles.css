@@ -1,0 +1,416 @@
+:root {
+  --bg: #f4efe7;
+  --bg-soft: rgba(255, 255, 255, 0.72);
+  --panel: rgba(255, 251, 246, 0.84);
+  --panel-strong: rgba(255, 255, 255, 0.94);
+  --border: rgba(125, 105, 80, 0.18);
+  --text: #2d241d;
+  --muted: #6f6256;
+  --accent: #0f7b6c;
+  --accent-soft: rgba(15, 123, 108, 0.12);
+  --danger: #a33d31;
+  --warn: #a36516;
+  --shadow: 0 18px 40px rgba(69, 47, 26, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(15, 123, 108, 0.14), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(219, 157, 52, 0.14), transparent 30%),
+    linear-gradient(135deg, #f6f1e8 0%, #efe6d9 100%);
+}
+
+.page-shell {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 24px;
+  padding: 24px;
+}
+
+.sidebar-panel,
+.action-panel,
+.output-panel {
+  backdrop-filter: blur(18px);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+}
+
+.sidebar-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 22px;
+  background: var(--panel);
+}
+
+.workspace-panel {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+}
+
+.action-panel,
+.output-panel {
+  background: var(--panel-strong);
+  padding: 24px;
+}
+
+.brand-card h1,
+.panel-header h2 {
+  margin: 6px 0 0;
+  font-family: "Space Grotesk", "IBM Plex Sans", sans-serif;
+  letter-spacing: -0.04em;
+}
+
+.brand-card h1 {
+  font-size: 2rem;
+}
+
+.lede,
+.helper-note,
+.toolbar-note,
+.empty-state,
+.meta-label,
+.eyebrow {
+  color: var(--muted);
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.meta-card,
+.project-toolbar,
+.project-item,
+.tab-strip,
+.output-card,
+.result-table,
+.status-banner {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+}
+
+.meta-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.project-toolbar {
+  padding: 16px;
+}
+
+.toolbar-row,
+.button-cluster,
+.toggle-grid,
+.tab-strip {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.toolbar-note {
+  margin: 12px 0 0;
+}
+
+input,
+textarea,
+button {
+  font: inherit;
+}
+
+input[type="text"],
+input[type="search"],
+textarea {
+  width: 100%;
+  border: 1px solid rgba(125, 105, 80, 0.22);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.84);
+  color: var(--text);
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
+}
+
+input:focus,
+textarea:focus {
+  border-color: rgba(15, 123, 108, 0.44);
+  box-shadow: 0 0 0 4px rgba(15, 123, 108, 0.12);
+}
+
+button {
+  cursor: pointer;
+  border: 0;
+  border-radius: 999px;
+  padding: 11px 16px;
+  transition: transform 140ms ease, opacity 140ms ease, background 140ms ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
+  transform: none;
+}
+
+.primary-button {
+  color: white;
+  background: linear-gradient(135deg, #0f7b6c, #169881);
+}
+
+.secondary-button {
+  background: #ecded0;
+  color: #342b24;
+}
+
+.ghost-button {
+  background: rgba(125, 105, 80, 0.08);
+  color: var(--text);
+}
+
+.project-list {
+  display: grid;
+  gap: 12px;
+  overflow: auto;
+  max-height: calc(100vh - 370px);
+  padding-right: 4px;
+}
+
+.project-item {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+}
+
+.project-item:hover {
+  transform: translateY(-1px);
+  border-color: rgba(15, 123, 108, 0.22);
+}
+
+.project-item input {
+  margin-right: 10px;
+}
+
+.project-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.project-name {
+  font-weight: 600;
+}
+
+.project-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 0.84rem;
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.chip.dirty {
+  color: var(--danger);
+  background: rgba(163, 61, 49, 0.12);
+}
+
+.chip.clean {
+  color: var(--accent);
+  background: rgba(15, 123, 108, 0.12);
+}
+
+.tab-button {
+  background: transparent;
+  color: var(--muted);
+  padding-inline: 18px;
+}
+
+.tab-button.active {
+  color: white;
+  background: linear-gradient(135deg, #403127, #624b3d);
+}
+
+.tab-panel {
+  display: none;
+  margin-top: 18px;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.form-grid .wide {
+  grid-column: 1 / -1;
+}
+
+label span {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.panel-header.compact {
+  margin-bottom: 16px;
+}
+
+.output-surface {
+  min-height: 240px;
+}
+
+.output-card,
+.status-banner {
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+
+.status-banner.warn {
+  background: rgba(163, 101, 22, 0.1);
+  border-color: rgba(163, 101, 22, 0.24);
+}
+
+.status-banner.error {
+  background: rgba(163, 61, 49, 0.1);
+  border-color: rgba(163, 61, 49, 0.24);
+}
+
+.status-banner.success {
+  background: rgba(15, 123, 108, 0.1);
+  border-color: rgba(15, 123, 108, 0.24);
+}
+
+.result-table {
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(125, 105, 80, 0.12);
+  vertical-align: top;
+}
+
+th {
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.status-pill.info {
+  background: rgba(15, 123, 108, 0.12);
+  color: var(--accent);
+}
+
+.status-pill.error {
+  background: rgba(163, 61, 49, 0.12);
+  color: var(--danger);
+}
+
+.status-pill.warn {
+  background: rgba(163, 101, 22, 0.12);
+  color: var(--warn);
+}
+
+.mono {
+  font-family: "IBM Plex Mono", "SFMono-Regular", monospace;
+  font-size: 0.88rem;
+}
+
+@media (max-width: 1120px) {
+  .page-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .project-list {
+    max-height: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .page-shell {
+    padding: 14px;
+    gap: 16px;
+  }
+
+  .sidebar-panel,
+  .action-panel,
+  .output-panel {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-header {
+    flex-direction: column;
+  }
+}
