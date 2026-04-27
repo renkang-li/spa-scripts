@@ -99,10 +99,15 @@ body {
 /* Sidebar */
 .sidebar-panel {
   width: 320px;
+  min-width: 240px;
+  max-width: 50vw;
   display: flex;
   flex-direction: column;
   background: var(--bg-panel);
   border-right: 1px solid var(--border);
+  resize: horizontal;
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 .sidebar-header {
@@ -202,6 +207,12 @@ body {
   font-weight: 600;
   max-width: 50%;
   flex-shrink: 0;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.project-branch-badge:hover {
+  background: #c7d2fe;
 }
 
 .project-branch-badge svg {
