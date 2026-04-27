@@ -552,6 +552,28 @@ button:disabled {
   color: #d1d5db;
 }
 
+.copy-block {
+  margin: 10px 0 0;
+  padding: 12px 14px;
+  background: rgba(15, 23, 42, 0.42);
+  border: 1px dashed rgba(148, 163, 184, 0.35);
+  border-radius: var(--radius-sm);
+  color: #e5e7eb;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.copy-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.copy-card-header strong {
+  margin-bottom: 0;
+}
+
 .status-banner {
   padding: 12px 16px;
   border-radius: var(--radius-md);

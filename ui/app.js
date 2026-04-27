@@ -79,6 +79,29 @@ function bindEvents() {
     }
   });
 
+  elements.output.addEventListener('click', async (event) => {
+    const trigger = event.target.closest('.copy-trigger');
+    if (!trigger) {
+      return;
+    }
+
+    event.preventDefault();
+    const copyTarget = trigger.closest('.copy-card')?.querySelector('[data-copy-content]');
+    const copyText = copyTarget?.textContent?.trim();
+    if (!copyText) {
+      flashButtonLabel(trigger, '无可复制内容');
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(copyText);
+      flashButtonLabel(trigger, '已复制');
+    } catch (error) {
+      console.error('Failed to copy output block', error);
+      flashButtonLabel(trigger, '复制失败');
+    }
+  });
+
   const resizer = document.querySelector('.sidebar-resizer');
   const sidebar = document.querySelector('.sidebar-panel');
   if (resizer && sidebar) {
@@ -386,12 +409,33 @@ function renderMergeBatch(mode, batch) {
         <div class="mono">成功 ${batch.summary.successCount} · 跳过 ${batch.summary.skippedCount} · 失败 ${batch.summary.failCount}</div>
       </div>
       ${renderTable([
-        '项目', '结果', '详情'
+        '项目', 'MR 链接', '详情'
       ], batch.results.map((result) => [
         escapeHtml(result.project),
-        renderStatus(result.success ? 'info' : 'error', result.success ? (result.skipped ? '已跳过' : '成功') : '失败'),
-        result.url ? `<a href="${escapeHtml(result.url)}" target="_blank" rel="noreferrer">${escapeHtml(result.url)}</a>` : escapeHtml(result.detail)
+        result.url
+          ? `<a class="mono" href="${escapeHtml(result.url)}" target="_blank" rel="noreferrer">${escapeHtml(result.url)}</a>`
+          : '<span class="mono">-</span>',
+        `${renderStatus(result.success ? 'info' : 'error', result.success ? (result.skipped ? '已存在' : '已创建') : '失败')}${result.success && result.skipped ? '' : ` ${escapeHtml(result.detail)}`}`
       ]))}
+      ${(() => {
+        const copyableLines = batch.results
+          .filter((result) => result.success && result.url)
+          .map((result) => result.url);
+
+        if (copyableLines.length === 0) {
+          return '';
+        }
+
+        return `
+          <div class="output-card copy-card">
+            <div class="copy-card-header">
+              <strong>可直接复制</strong>
+              <button type="button" class="ghost-button small copy-trigger">复制全部</button>
+            </div>
+            <pre class="copy-block mono" data-copy-content>${escapeHtml(copyableLines.join('\n'))}</pre>
+          </div>
+        `;
+      })()}
     ` : ''}
   `);
 }
@@ -414,13 +458,32 @@ function renderVersionBatch(mode, batch) {
         <div class="mono">成功 ${batch.summary.successCount} · 已推送 ${batch.summary.pushedCount} · 失败 ${batch.summary.failCount}</div>
       </div>
       ${renderTable([
-        '项目', '结果', 'Tag', '详情'
+        '项目', 'Tag', '结果', '详情'
       ], batch.results.map((result) => [
         escapeHtml(result.project),
-        renderStatus(result.success ? 'info' : 'error', result.success ? '成功' : '失败'),
         `<span class="mono">${escapeHtml(result.tag || '(无)')}</span>`,
+        renderStatus(result.success ? 'info' : 'error', result.success ? '成功' : '失败'),
         escapeHtml(result.detail)
       ]))}
+      ${(() => {
+        const copyableLines = batch.results
+          .filter((result) => result.success && result.tag)
+          .map((result) => `${result.project}:${result.tag}`);
+
+        if (copyableLines.length === 0) {
+          return '';
+        }
+
+        return `
+          <div class="output-card copy-card">
+            <div class="copy-card-header">
+              <strong>可直接复制</strong>
+              <button type="button" class="ghost-button small copy-trigger">复制全部</button>
+            </div>
+            <pre class="copy-block mono" data-copy-content>${escapeHtml(copyableLines.join('\n'))}</pre>
+          </div>
+        `;
+      })()}
     ` : ''}
   `);
 }
@@ -464,6 +527,18 @@ function renderTable(headers, rows) {
 
 function renderStatus(type, label) {
   return `<span class="status-pill ${type}">${label}</span>`;
+}
+
+function flashButtonLabel(button, nextLabel) {
+  if (!button.dataset.originalLabel) {
+    button.dataset.originalLabel = button.textContent;
+  }
+
+  button.textContent = nextLabel;
+  window.clearTimeout(Number(button.dataset.resetTimer || 0));
+  button.dataset.resetTimer = String(window.setTimeout(() => {
+    button.textContent = button.dataset.originalLabel || '复制全部';
+  }, 1200));
 }
 
 function escapeHtml(value) {
