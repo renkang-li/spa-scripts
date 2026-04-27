@@ -43,8 +43,7 @@ function bindElements() {
 
 function bindEvents() {
   document.getElementById('refresh-projects').addEventListener('click', refreshProjects);
-  document.getElementById('select-visible').addEventListener('click', selectVisibleProjects);
-  document.getElementById('clear-selection').addEventListener('click', clearSelection);
+  document.getElementById('toggle-selection').addEventListener('click', toggleSelection);
   document.getElementById('clear-output').addEventListener('click', clearOutput);
   document.getElementById('plan-action').addEventListener('click', () => runAction('plan'));
   document.getElementById('run-action').addEventListener('click', () => runAction('run'));
@@ -95,6 +94,24 @@ function renderProjects() {
   const visibleProjects = getVisibleProjects();
   elements.projectSummary.textContent = `已选 ${state.selected.size} / ${state.projects.length} 个项目，可见 ${visibleProjects.length} 个。`;
 
+  const toggleBtn = document.getElementById('toggle-selection');
+  if (toggleBtn) {
+    if (visibleProjects.length === 0) {
+      toggleBtn.textContent = '全选';
+      toggleBtn.disabled = true;
+    } else {
+      toggleBtn.disabled = false;
+      const selectedVisibleCount = visibleProjects.filter(p => state.selected.has(p.name)).length;
+      if (selectedVisibleCount === 0) {
+        toggleBtn.textContent = '全选';
+      } else if (selectedVisibleCount === visibleProjects.length) {
+        toggleBtn.textContent = '清空';
+      } else {
+        toggleBtn.textContent = '反选';
+      }
+    }
+  }
+
   if (visibleProjects.length === 0) {
     elements.projectList.innerHTML = '<p class="empty-state">没有匹配的项目。</p>';
     return;
@@ -107,15 +124,29 @@ function renderProjects() {
           <input type="checkbox" data-project="${escapeHtml(project.name)}" ${state.selected.has(project.name) ? 'checked' : ''}>
           <span class="project-name">${escapeHtml(project.name)}</span>
         </div>
-        <span class="chip ${project.dirty ? 'dirty' : 'clean'}">${project.dirty ? 'dirty' : 'clean'}</span>
+        <div class="project-branch-badge mono" title="${escapeHtml(project.currentBranch)}">
+          <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor">
+            <path d="M11.75 2.5a.75.75 0 100 1.5.75.75 0 000-1.5zm-2.25.75a2.25 2.25 0 113 2.122V6A2.5 2.5 0 0110 8.5H6a1 1 0 00-1 1v1.128a2.251 2.251 0 11-1.5 0V5.372a2.25 2.25 0 111.5 0v1.836A2.492 2.492 0 016 7h4a1 1 0 001-1v-.628A2.25 2.25 0 019.5 3.25zM4.25 12a.75.75 0 100 1.5.75.75 0 000-1.5zM3.5 3.25a.75.75 0 111.5 0 .75.75 0 01-1.5 0z"></path>
+          </svg>
+          <span>${escapeHtml(project.currentBranch)}</span>
+        </div>
       </div>
-      <div class="project-branch">
-        <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
-          <path d="M11.75 2.5a.75.75 0 100 1.5.75.75 0 000-1.5zm-2.25.75a2.25 2.25 0 113 2.122V6A2.5 2.5 0 0110 8.5H6a1 1 0 00-1 1v1.128a2.251 2.251 0 11-1.5 0V5.372a2.25 2.25 0 111.5 0v1.836A2.492 2.492 0 016 7h4a1 1 0 001-1v-.628A2.25 2.25 0 019.5 3.25zM4.25 12a.75.75 0 100 1.5.75.75 0 000-1.5zM3.5 3.25a.75.75 0 111.5 0 .75.75 0 01-1.5 0z"></path>
-        </svg>
-        <span class="mono">${escapeHtml(project.currentBranch)}</span>
+      ${project.dirtyEntries.length ? `
+      <div class="project-dirty-summary">
+        <span class="chip dirty">${project.dirtyEntries.length} 处变更</span>
       </div>
-      ${project.dirtyEntries.length ? `<div class="project-dirty-files mono">${escapeHtml(project.dirtyEntries.join(' · '))}</div>` : ''}
+      <div class="project-dirty-files mono">
+        ${project.dirtyEntries.slice(0, 3).map(entry => {
+          const status = entry.substring(0, 2);
+          const path = entry.substring(2).trim();
+          return `<div class="dirty-file-item" title="${escapeHtml(path)}">
+            <span class="dirty-file-status">${escapeHtml(status)}</span>
+            <span class="dirty-file-path">${escapeHtml(path)}</span>
+          </div>`;
+        }).join('')}
+        ${project.dirtyEntries.length > 3 ? `<div class="dirty-file-more">... 还有 ${project.dirtyEntries.length - 3} 个文件</div>` : ''}
+      </div>
+      ` : ''}
     </label>
   `).join('');
 
@@ -143,13 +174,25 @@ function getVisibleProjects() {
   ));
 }
 
-function selectVisibleProjects() {
-  getVisibleProjects().forEach((project) => state.selected.add(project.name));
-  renderProjects();
-}
+function toggleSelection() {
+  const visible = getVisibleProjects();
+  if (visible.length === 0) return;
 
-function clearSelection() {
-  state.selected.clear();
+  const selectedVisibleCount = visible.filter(p => state.selected.has(p.name)).length;
+
+  if (selectedVisibleCount === 0) {
+    visible.forEach(p => state.selected.add(p.name));
+  } else if (selectedVisibleCount === visible.length) {
+    visible.forEach(p => state.selected.delete(p.name));
+  } else {
+    visible.forEach(p => {
+      if (state.selected.has(p.name)) {
+        state.selected.delete(p.name);
+      } else {
+        state.selected.add(p.name);
+      }
+    });
+  }
   renderProjects();
 }
 
