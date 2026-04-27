@@ -99,7 +99,7 @@
                 <span>创建前推送分支</span>
               </label>
               <label class="toggle-row">
-                <input id="merge-commit" type="checkbox">
+                <input id="merge-commit" type="checkbox" checked>
                 <span>自动提交未提交更改</span>
               </label>
             </div>
@@ -118,15 +118,11 @@
             </div>
             <div class="toggle-grid">
               <label class="toggle-row">
-                <input id="version-push" type="checkbox">
+                <input id="version-push" type="checkbox" checked>
                 <span>创建后推送 tag</span>
               </label>
-              <label class="toggle-row">
-                <input id="version-dry-run" type="checkbox" checked>
-                <span>执行时仍使用 dry-run</span>
-              </label>
             </div>
-            <p class="helper-note">提示: 预览会同步远程 tag 并计算下一个 RC 版本。</p>
+            <p class="helper-note">提示: “预览计划”只演练；“执行操作”会真实创建 RC tag，并默认推送到远程。</p>
           </div>
         </div>
 

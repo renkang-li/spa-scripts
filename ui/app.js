@@ -38,7 +38,6 @@ function bindElements() {
 
   elements.versionMessage = document.getElementById('version-message');
   elements.versionPush = document.getElementById('version-push');
-  elements.versionDryRun = document.getElementById('version-dry-run');
 }
 
 function bindEvents() {
@@ -259,7 +258,6 @@ function buildPayload() {
     projects,
     message: elements.versionMessage.value.trim(),
     push: elements.versionPush.checked,
-    dryRun: elements.versionDryRun.checked,
   };
 }
 
