@@ -38,6 +38,9 @@ function bindElements() {
 
   elements.versionMessage = document.getElementById('version-message');
   elements.versionPush = document.getElementById('version-push');
+  elements.versionSourceMode = document.getElementById('version-source-mode');
+  elements.versionRemoteBranch = document.getElementById('version-remote-branch');
+  elements.versionRemoteBranchGroup = document.getElementById('version-remote-branch-group');
 }
 
 function bindEvents() {
@@ -54,6 +57,11 @@ function bindEvents() {
 
   elements.tabButtons.forEach((button) => {
     button.addEventListener('click', () => switchTab(button.dataset.tab));
+  });
+
+  elements.versionSourceMode.addEventListener('change', () => {
+    const isRemote = elements.versionSourceMode.value === 'remote-branch';
+    elements.versionRemoteBranchGroup.style.display = isRemote ? '' : 'none';
   });
 
   elements.projectList.addEventListener('click', async (event) => {
@@ -299,6 +307,8 @@ function buildPayload() {
     projects,
     message: elements.versionMessage.value.trim(),
     push: elements.versionPush.checked,
+    sourceMode: elements.versionSourceMode.value,
+    remoteBranch: elements.versionRemoteBranch.value.trim(),
   };
 }
 
@@ -435,11 +445,12 @@ function renderVersionBatch(mode, batch) {
 
   appendCard('批量 RC Tag', `
     ${renderTable([
-      '项目', '基础版本', '新 RC', '状态'
+      '项目', '基础版本', '新 RC', 'Tag 基于', '状态'
     ], batch.previews.map((preview) => [
       escapeHtml(preview.project),
       `<span class="mono">${escapeHtml(preview.baseVersion || '(无)')}</span>`,
       `<span class="mono">${escapeHtml(preview.version || '(无法生成)')}</span>`,
+      `<span class="mono">${escapeHtml(preview.sourceRef || 'HEAD')}</span>`,
       renderStatus(preview.success ? 'info' : 'error', escapeHtml(preview.success ? '可创建' : preview.error))
     ]))}
     ${batch.results && batch.results.length ? `

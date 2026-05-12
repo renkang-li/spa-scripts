@@ -114,6 +114,17 @@
 
           <div class="tab-panel" data-panel="version">
             <div class="form-grid">
+              <label class="form-group">
+                <span>Tag 来源</span>
+                <select id="version-source-mode">
+                  <option value="head">当前本地 HEAD</option>
+                  <option value="remote-branch">远端分支</option>
+                </select>
+              </label>
+              <label class="form-group" id="version-remote-branch-group" style="display:none">
+                <span>远端分支名</span>
+                <input id="version-remote-branch" type="text" placeholder="例如: feature/checkout-funnel（不含 origin/）">
+              </label>
               <label class="form-group wide">
                 <span>Tag 注释</span>
                 <input id="version-message" type="text" placeholder="默认使用版本号">
@@ -125,7 +136,7 @@
                 <span>创建后推送 tag</span>
               </label>
             </div>
-            <p class="helper-note">提示: “预览计划”只演练；“执行操作”会真实创建 RC tag，并默认推送到远程。</p>
+            <p class="helper-note">提示: "预览计划"只演练；"执行操作"会真实创建 RC tag，并默认推送到远程。远端分支模式会先 fetch，直接在 origin/&lt;branch&gt; 上创建 tag，不切换本地工作区。</p>
           </div>
         </div>
 
@@ -141,7 +152,7 @@
           <button id="clear-output" class="ghost-button small">清空</button>
         </div>
         <div id="output" class="output-surface">
-          <div class="empty-state">先选择项目，再点击“预览计划”或“执行操作”。</div>
+          <div class="empty-state">先选择项目，再点击"预览计划"或"执行操作"。</div>
         </div>
       </section>
     </main>

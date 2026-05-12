@@ -405,7 +405,8 @@ body {
 
 input[type="text"],
 input[type="search"],
-textarea {
+textarea,
+select {
   width: 100%;
   padding: 8px 12px;
   border: 1px solid #d1d5db;
@@ -413,10 +414,13 @@ textarea {
   font-family: inherit;
   font-size: 0.9375rem;
   outline: none;
+  background: var(--bg-panel);
+  color: var(--text-main);
 }
 input[type="text"]:focus,
 input[type="search"]:focus,
-textarea:focus {
+textarea:focus,
+select:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
 }

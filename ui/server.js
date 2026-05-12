@@ -154,6 +154,7 @@ function serializeVersionBatch(batch) {
       project: preview.project.name,
       baseVersion: preview.baseVersion || null,
       version: preview.version || null,
+      sourceRef: preview.sourceRef || 'HEAD',
       fetchError: preview.fetchError,
       success: preview.success === true,
       error: preview.error || null,
@@ -259,18 +260,23 @@ async function handleApi(request, response, parsedUrl) {
   }
 
   if (parsedUrl.pathname === '/api/version/plan' || parsedUrl.pathname === '/api/version/run') {
-    const batchPlan = createVersionBatchPlan(selectedProjects, {
+    if (body.sourceMode === 'remote-branch' && !String(body.remoteBranch || '').trim()) {
+      respondJson(response, 400, { error: '远端分支模式下分支名不能为空' });
+      return;
+    }
+
+    const versionOpts = {
       message: body.message,
       push: body.push === true,
       dryRun: parsedUrl.pathname.endsWith('/plan') ? true : body.dryRun === true,
-    });
+      sourceMode: body.sourceMode || 'head',
+      remoteBranch: (body.remoteBranch || '').trim(),
+    };
+
+    const batchPlan = createVersionBatchPlan(selectedProjects, versionOpts);
 
     if (parsedUrl.pathname.endsWith('/run')) {
-      const execution = executeVersionBatch(batchPlan, {
-        message: body.message,
-        push: body.push === true,
-        dryRun: body.dryRun === true,
-      });
+      const execution = executeVersionBatch(batchPlan, versionOpts);
       respondJson(response, 200, { batch: serializeVersionBatch(execution) });
       return;
     }
