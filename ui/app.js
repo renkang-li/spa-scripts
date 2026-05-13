@@ -247,10 +247,12 @@ function getVisibleProjects() {
     return state.projects;
   }
 
-  return state.projects.filter((project) => (
-    project.name.toLowerCase().includes(state.filter)
-    || project.repoPath.toLowerCase().includes(state.filter)
-  ));
+  const terms = state.filter.split(/[\s,]+/).filter(Boolean);
+  return state.projects.filter((project) => {
+    const name = project.name.toLowerCase();
+    const repo = project.repoPath.toLowerCase();
+    return terms.some((t) => name.includes(t) || repo.includes(t));
+  });
 }
 
 function toggleSelection() {
