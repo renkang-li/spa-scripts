@@ -168,7 +168,7 @@ async function handleApi(request, response, parsedUrl) {
   if (request.method === 'GET' && parsedUrl.pathname === '/api/environment') {
     respondJson(response, 200, {
       workspaceRoot: resolveWorkspaceRoot(),
-      glabAvailable: Boolean(findGlabPath()),
+      glabAvailable: Boolean(await findGlabPath()),
       defaultBranchBase: 'origin/master',
     });
     return;
@@ -176,7 +176,7 @@ async function handleApi(request, response, parsedUrl) {
 
   if (request.method === 'GET' && parsedUrl.pathname === '/api/projects') {
     respondJson(response, 200, {
-      projects: buildProjectCatalog().map((project) => ({
+      projects: (await buildProjectCatalog()).map((project) => ({
         name: project.name,
         currentBranch: project.currentBranch,
         repoPath: project.repoPath,
@@ -203,14 +203,14 @@ async function handleApi(request, response, parsedUrl) {
       return;
     }
 
-    const batchPlan = createBranchBatchPlan(selectedProjects, validation.branchName, {
+    const batchPlan = await createBranchBatchPlan(selectedProjects, validation.branchName, {
       base: body.base,
       fetch: body.fetch !== false,
       dryRun: parsedUrl.pathname.endsWith('/plan') ? true : body.dryRun === true,
     });
 
     if (parsedUrl.pathname.endsWith('/run')) {
-      const execution = executeBranchBatch(batchPlan, {
+      const execution = await executeBranchBatch(batchPlan, {
         base: body.base,
         fetch: body.fetch !== false,
         dryRun: body.dryRun === true,
@@ -229,7 +229,7 @@ async function handleApi(request, response, parsedUrl) {
       return;
     }
 
-    const batchPlan = createMergeBatchPlan(selectedProjects, {
+    const batchPlan = await createMergeBatchPlan(selectedProjects, {
       source: body.source,
       target: body.target,
       title: body.title,
@@ -241,7 +241,7 @@ async function handleApi(request, response, parsedUrl) {
     });
 
     if (parsedUrl.pathname.endsWith('/run')) {
-      const execution = executeMergeBatch(batchPlan, {
+      const execution = await executeMergeBatch(batchPlan, {
         source: body.source,
         target: body.target,
         title: body.title,
@@ -273,10 +273,10 @@ async function handleApi(request, response, parsedUrl) {
       remoteBranch: (body.remoteBranch || '').trim(),
     };
 
-    const batchPlan = createVersionBatchPlan(selectedProjects, versionOpts);
+    const batchPlan = await createVersionBatchPlan(selectedProjects, versionOpts);
 
     if (parsedUrl.pathname.endsWith('/run')) {
-      const execution = executeVersionBatch(batchPlan, versionOpts);
+      const execution = await executeVersionBatch(batchPlan, versionOpts);
       respondJson(response, 200, { batch: serializeVersionBatch(execution) });
       return;
     }
