@@ -421,7 +421,7 @@ function renderMergeBatch(mode, batch) {
       ]))}
       ${(() => {
         const copyableLines = batch.results
-          .filter((result) => result.success && result.url)
+          .filter((result) => result.url)
           .map((result) => result.url);
 
         if (copyableLines.length === 0) {
